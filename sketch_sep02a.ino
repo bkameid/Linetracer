@@ -20,10 +20,10 @@ void setup() {
   pinMode(d7, INPUT);
 }
 
-// max : array -> int
+// max : array -> float
 // Devuelve el valor máximo de una array
-int maxi(int list[6]) {
-  int maximum = 0;
+float maxi(int list[6]) {
+  float maximum = 0;
   for (int i = 0; i<6; i++) {
     if (list[i] > maximum) {
       maximum = list[i];
@@ -50,12 +50,12 @@ int relative_pos() {
   int suma = 0;
   int nums[] = {-3, -2, -1, 1, 2, 3};
   readIR();
-  int maximum = maxi(valores);
+  float ratio = 1024.0 / maxi(valores);
   for (int i = 0; i<6; i++) {
     if (valores[i] <= 100) {  // Filtro de Ruido
       valores[i] = 0;
     }
-    valores[i] = valores[i]*nums[i];
+    valores[i] = valores[i]*nums[i]*ratio;
     suma += valores[i];
   }
   int result = suma / 6;
