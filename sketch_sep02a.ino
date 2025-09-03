@@ -32,7 +32,7 @@ int maxi(int list[6]) {
   return maximum;
 }
 
-// readIR : none -> array(int)
+// readIR : none -> none
 // Lee los valores de los sensores IR del frente y los convierte en array
 int readIR() {
   valores[0] = analogRead(d2);
@@ -52,7 +52,7 @@ int relative_pos() {
   readIR();
   int maximum = maxi(valores);
   for (int i = 0; i<6; i++) {
-    if (valores[i] <= 100) { // Filtro de Ruido
+    if (valores[i] <= 100) {  // Filtro de Ruido
       valores[i] = 0;
     }
     valores[i] = valores[i]*nums[i];
