@@ -1,0 +1,67 @@
+#define led 0
+#define d2 13
+#define d3 14
+#define d4 15
+#define d5 16
+#define d6 17
+#define d7 18
+#define IR 10
+
+int valores[6];
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(IR, OUTPUT);
+  pinMode(d2, INPUT);
+  pinMode(d3, INPUT);
+  pinMode(d4, INPUT);
+  pinMode(d5, INPUT);
+  pinMode(d6, INPUT);
+  pinMode(d7, INPUT);
+}
+
+// max : array -> int
+// Devuelve el valor máximo de una array
+int maxi(int list[6]) {
+  int maximum = 0;
+  for (int i = 0; i<6; i++) {
+    if (list[i] > maximum) {
+      maximum = list[i];
+    }
+  }
+  return maximum;
+}
+
+// readIR : none -> array(int)
+// Lee los valores de los sensores IR del frente y los convierte en array
+int readIR() {
+  valores[0] = analogRead(d2);
+  valores[1] = analogRead(d3);
+  valores[2] = analogRead(d4);
+  valores[3] = analogRead(d5);
+  valores[4] = analogRead(d6);
+  valores[5] = analogRead(d7);
+}
+
+// relative_pos : void -> int
+// Devuelve un valor entre -1023 y 1023 correspondiendo a la posición de la
+// linea relativa al vehículo
+int relative_pos() {
+  int suma = 0;
+  int nums[] = {-3, -2, -1, 1, 2, 3};
+  readIR();
+  int maximum = maxi(valores);
+  for (int i = 0; i<6; i++) {
+    if (valores[i] <= 100) { // Filtro de Ruido
+      valores[i] = 0;
+    }
+    valores[i] = valores[i]*nums[i];
+    suma += valores[i];
+  }
+  int result = suma / 6;
+  return result;
+}
+
+void loop() {
+  Serial.println(relative_pos());
+}
