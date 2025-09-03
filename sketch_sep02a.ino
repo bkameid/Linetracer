@@ -5,7 +5,7 @@
 #define d5 16
 #define d6 17
 #define d7 18
-#define IR 10
+#define IR 11
 
 int valores[6];
 
