@@ -55,6 +55,7 @@ int relative_pos() {
     if (valores[i] <= 100) {  // Filtro de Ruido
       valores[i] = 0;
     }
+    Serial.print(valores[i]); Serial.print(" ");
     valores[i] = valores[i]*nums[i]*ratio;
     suma += valores[i];
   }
