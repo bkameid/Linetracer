@@ -63,6 +63,8 @@ int relative_pos() {
   return result;
 }
 
+digitalWrite(IR, HIGH);
+
 void loop() {
   Serial.println(relative_pos());
 }
