@@ -1,4 +1,3 @@
-#define led 0
 #define d2 13
 #define d3 14
 #define d4 15
@@ -18,6 +17,9 @@ void setup() {
   pinMode(d5, INPUT);
   pinMode(d6, INPUT);
   pinMode(d7, INPUT);
+  
+  digitalWrite(IR, HIGH);
+  
 }
 
 // max : array -> float
@@ -62,8 +64,6 @@ int relative_pos() {
   int result = suma / 6;
   return result;
 }
-
-digitalWrite(IR, HIGH);
 
 void loop() {
   Serial.println(relative_pos());
