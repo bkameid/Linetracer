@@ -1,9 +1,9 @@
-#define d2 13
-#define d3 14
-#define d4 15
-#define d5 16
-#define d6 17
-#define d7 18
+#define d2 A1
+#define d3 A2
+#define d4 A3
+#define d5 A4
+#define d6 A5
+#define d7 A6
 #define IR 11
 
 int valores[6];
