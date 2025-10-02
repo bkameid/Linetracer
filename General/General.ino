@@ -17,6 +17,15 @@
 #define button 2
 
 int valores[6];
+float Kp = 0.1; //Constante Proporcional
+float Ki = 0.1;    //Constante Integral
+float Kd = 0.01;  //Constante Derivada
+float error = 0, lastError = 0;
+float integral = 0;
+float derivative = 0;
+float pos = 0, lastPos = 0;
+
+int velocity = 33;
 
 void setup() {
   Serial.begin(9600);
@@ -27,8 +36,6 @@ void setup() {
   pinMode(d5, INPUT);
   pinMode(d6, INPUT);
   pinMode(d7, INPUT);
-  
-  digitalWrite(IR, HIGH);
   
   pinMode(PWMA, OUTPUT);
   pinMode(AI2, OUTPUT);
@@ -102,38 +109,24 @@ else {
 
 void mover(int leftSpeed, int rightSpeed) {
   // Función para mover el robot, leftSpeed y rightSpeed van de -255 a 255
-  if (pwr) {
     // Move Forward
   digitalWrite(AI1, HIGH);
   digitalWrite(AI2, LOW);
-  analogWrite(PWMA, rightSpeed); // Speed for Motor A
+  analogWrite(PWMA, leftSpeed); // Speed for Motor A
 
   digitalWrite(BI1, HIGH);
   digitalWrite(BI2, LOW);
-  analogWrite(PWMB, leftSpeed); // Speed for Motor B
-  }
+  analogWrite(PWMB, rightSpeed); // Speed for Motor B
 }
 
-float Kp = 0,39; //Constante Proporcional
-float Ki = 0,1;    //Constante Integral
-float Kd = 0,01;  //Constante Derivada
-float error = 0, lastError = 0;
-float integral = 0;
-float derivative = 0;
-float pos = 0, lastPos = 0;
-
-int velocity = 50;
-
 void loop() {
-  pos = relative_pos();
-  error = pos;
-  integral = integral + error;
-  derivative = error - lastError;
-  float output = Kp*error + Ki*integral + Kd*derivative;
-  lastError = error;
-  int leftSpeed = velocity + output;
-  int rightSpeed = velocity - output;
+  if (pwr) {
+    digitalWrite(IR, HIGH);
+    pos = relative_pos();
+    mover(velocity-pos, velocity+pos);
+  } else {
+    mover(0,0);
+  }
 
   PowerBttn();
-  mover(leftSpeed, rightSpeed);
 }
