@@ -31,17 +31,21 @@ void PowerBttn() {
   }
 }
 
+int v = 60;
+
 void loop() {
     PowerBttn(); //Esta weaa no está funcionando xd
 
     if (pwr) {
+      v++;
       // Move Forward
-    digitalWrite(AI1, HIGH);
-    digitalWrite(AI2, LOW);
-    analogWrite(PWMA, 33); // Speed for Motor A
-
-    digitalWrite(BI1, HIGH);
-    digitalWrite(BI2, LOW);
-    analogWrite(PWMB, 33); // Speed for Motor B
+      digitalWrite(AI1, HIGH);
+      digitalWrite(AI2, LOW);
+      analogWrite(PWMA, v); // Speed for Motor A
+  
+      digitalWrite(BI1, HIGH);
+      digitalWrite(BI2, LOW);
+      analogWrite(PWMB, v); // Speed for Motor B
+      delay(500);
     }
 }
