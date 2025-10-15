@@ -90,9 +90,6 @@ int relative_pos() {
   float minimo = mini(valores);
   for (int i = 0; i<6; i++) {
     valores[i] = map(valores[i], 1024, minimo, 0, 255);
-    if (valores[i] < 50) {
-      valores[i] = 0;
-    }
   }
   float sumaPonderada = -2.5*valores[0]-1.5*valores[1]-0.5*valores[2]+0.5*valores[3]+1.5*valores[4]+2.5*valores[5];
 
@@ -171,7 +168,7 @@ void hits() {
 }
 
 void PID() {
-  pos = relative_pos() + 100;
+  pos = relative_pos();
   error = pos;
   integral = integral + error;
   derivative = error - lastError;
