@@ -8,7 +8,7 @@
 
 #define button 2
 
-bool pwr = false;
+bool pwr = true;
 
 void setup() {
     Serial.begin(9600);
@@ -31,21 +31,35 @@ void PowerBttn() {
   }
 }
 
-int v = 60;
+int smoothing(int vi, int vf, int ti) {
+  float delta = vf - vi;
+  float step = delta / 2000;
+  int v = int(vi + step * (millis() - ti));
+  Serial.print(vi); Serial.print(" | "); Serial.print(step); Serial.print(" | "); Serial.print(millis() - ti); Serial.print(" | "); Serial.println(int(step*(millis() - ti)));
+  if ((step > 0 && v > vf) || (step < 0 && v < vf)) {
+    v = vf;
+  }
+  return v;
+}
+
+void mover(int leftSpeed, int rightSpeed) {
+  // Función para mover el robot, leftSpeed y rightSpeed van de -255 a 255
+    // Move Forward
+  digitalWrite(AI1, HIGH);
+  digitalWrite(AI2, LOW);
+  analogWrite(PWMA, leftSpeed); // Speed for Motor A
+
+  digitalWrite(BI1, HIGH);
+  digitalWrite(BI2, LOW);
+  analogWrite(PWMB, rightSpeed); // Speed for Motor B
+}
+
+int v = 0;
 
 void loop() {
     PowerBttn(); //Esta weaa no está funcionando xd
 
     if (pwr) {
-      v++;
-      // Move Forward
-      digitalWrite(AI1, HIGH);
-      digitalWrite(AI2, LOW);
-      analogWrite(PWMA, v); // Speed for Motor A
-  
-      digitalWrite(BI1, HIGH);
-      digitalWrite(BI2, LOW);
-      analogWrite(PWMB, v); // Speed for Motor B
-      delay(500);
+      mover(100,100);
     }
 }

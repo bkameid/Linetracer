@@ -87,24 +87,11 @@ int readIR() {
 // linea relativa al vehículo
 int relative_pos() {
   readIR();
-  float sumaPonderada = -2.5*valores[0]-1.5*valores[1]-0.5*valores[2]+0.5*valores[3]+1.5*valores[4]+2.5*valores[5];
-  float suma = valores[0]+valores[1]+valores[2]+valores[3]+valores[4]+valores[5];
-  bool onLine = false;
-if (suma > 1000){
-    onLine  = true;
-  } 
-  if (onLine) {
-      pos = int(100.0 * sumaPonderada / suma);
-  } 
-else {
-  if (lastPos < 0) {
-        pos = -255;
-    } else if (lastPos >= 0) {
-        pos = 255;
-    }
+  for (int i = 0; i<6; i++) {
+    valores[i] = map(valores[i], 0, maxi(valores), 0, 255);
   }
-  lastPos = pos;
-  return pos;
+  float sumaPonderada = -2.5*valores[0]-1.5*valores[1]-0.5*valores[2]+0.5*valores[3]+1.5*valores[4]+2.5*valores[5];
+  return sumaPonderada/6;
 }
 
 void mover(int leftSpeed, int rightSpeed) {

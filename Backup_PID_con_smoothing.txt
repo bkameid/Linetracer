@@ -75,7 +75,7 @@ float mini(int list[6]) {
 // Lee los valores de los sensores IR del frente y los convierte en array
 int readIR() {
   valores[5] = analogRead(d2);
-  valores[4] = analogRead(d3); // Calibración
+  valores[4] = analogRead(d3);
   valores[3] = analogRead(d4);
   valores[2] = analogRead(d5);
   valores[1] = analogRead(d6);
@@ -83,7 +83,7 @@ int readIR() {
 }
 
 // relative_pos : void -> int
-// Devuelve un valor entre -255 y 255 correspondiendo a la posición de la
+// Devuelve un valor entre -1023 y 1023 correspondiendo a la posición de la
 // linea relativa al vehículo
 int relative_pos() {
   readIR();
@@ -97,6 +97,16 @@ int relative_pos() {
   float sumaPonderada = -2.5*valores[0]-1.5*valores[1]-0.5*valores[2]+0.5*valores[3]+1.5*valores[4]+2.5*valores[5];
 
   return sumaPonderada/9;
+}
+
+int smoothing(int vi, int vf, int ti) {
+  float delta = vf - vi;
+  float step = delta / 500;
+  int v = vi + step * (millis() - ti);
+  if ((step > 0 && v > vf) || (step < 0 && v < vf)) {
+    v = vf;
+  }
+  return v;
 }
 
 void mover(int leftSpeed, int rightSpeed) {
@@ -115,7 +125,7 @@ bool hitR = false;
 bool hitL = false;
 int geo[4] = {0,0,0,0}; 
 
-float Kp = 0.3; //Constante Proporcional
+float Kp = 0.2; //Constante Proporcional
 float Kd = 0.2;  //Constante Derivada
 float Ki = 0;    //Constante Integral
 float error = 0, lastError = 0;
@@ -123,10 +133,13 @@ float integral = 0;
 float derivative = 0;
 float pos = 0, lastPos = 0;
 
-int vRecta = 40;
+int vRecta = 70;
 int vCurva = 30;
 
-int velocity = vRecta;
+int velocity = 70;
+int vf = vRecta;
+int vi = vRecta;
+int ti = 0;
 
 int umbral = 1000;
 
@@ -150,15 +163,19 @@ void hits() {
   if (geo[0] != geo[1]) {
     if (geo[0] == 0 && geo[1] == 1 && geo[2] == 0) {
       // Código hit Izq
-      /*if (hitL == false) {
+      if (hitL == false) {
         hitL = true;
         Kp = 0.5;
-        velocity = vCurva;
+        ti = millis();
+        //vi = velocity;
+        vf = vCurva;
       } else {
         hitL = false;
         Kp = 0.2;
-        velocity = vRecta;
-      }*/
+        //vi = velocity;
+        //ti = millis();
+        vf = vRecta;
+      }
     } else if (geo[0] == 0 && geo[1] == 2 && geo[2] == 0) {
       // Código hit Der
     } else if (geo[0] == 0 && geo[1] == 3 && geo[2] == 0) {
@@ -171,11 +188,11 @@ void hits() {
 }
 
 void PID() {
-  pos = relative_pos() + 100;
+  pos = relative_pos();
   error = pos;
   integral = integral + error;
   derivative = error - lastError;
-  int adjust = Kp*error + Ki*integral + Kd*derivative;
+  int adjust = int(Kp*error + Ki*integral + Kd*derivative);
   lastError = error;
   int leftSpeed = velocity - adjust;
   int rightSpeed = velocity + adjust;
@@ -193,8 +210,8 @@ void PID() {
     rightSpeed = 0;
   }
 
-  //mover(leftSpeed, rightSpeed);
-  Serial.print(relative_pos());Serial.print("   |   ");
+  mover(leftSpeed, rightSpeed);
+  Serial.print(pos);Serial.print("   |   ");
   Serial.println(adjust);
 }
 
