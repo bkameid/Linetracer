@@ -108,13 +108,13 @@ void mover(int leftSpeed, int rightSpeed) {
   analogWrite(PWMB, rightSpeed); // Speed for Motor B
 }
 
-bool hitR = false;
+int hitR = 0;
 bool hitL = false;
 int geo[4] = {0,0,0,0}; 
 
-float Kp = 0.3; //Constante Proporcional
-float Kd = 0.2;  //Constante Derivada
-float Ki = 0;    //Constante Integral
+float Kp = 0.20; //Constante Proporcional
+float Kd = 0;  //Constante Derivada
+float Ki = 0.0;    //Constante Integral
 float error = 0, lastError = 0;
 float integral = 0;
 float derivative = 0;
@@ -158,6 +158,7 @@ void hits() {
       }*/
     } else if (geo[0] == 0 && geo[1] == 2 && geo[2] == 0) {
       // Código hit Der
+      hitR = hitR + 1;
     } else if (geo[0] == 0 && geo[1] == 3 && geo[2] == 0) {
       // Código hit Ambos
     }
@@ -174,6 +175,9 @@ void PID() {
   derivative = error - lastError;
   int adjust = Kp*error + Ki*integral + Kd*derivative;
   lastError = error;
+  if (adjust < 0) {
+    adjust *= 1.5;
+  }
   int leftSpeed = velocity - adjust;
   int rightSpeed = velocity + adjust;
 
@@ -190,7 +194,7 @@ void PID() {
     rightSpeed = 0;
   }
 
-  //mover(leftSpeed, rightSpeed);
+  mover(leftSpeed, rightSpeed);
   Serial.print(relative_pos());Serial.print("   |   ");
   Serial.println(adjust);
 }
@@ -202,6 +206,17 @@ void loop() {
     hits();
   } else {
     mover(0,0);
+  }
+
+  if(hitR >= 2 && false) {
+    delay(200);
+    while(true) {
+      mover(0,0);
+      tone(buzzer, 1000, 100);
+      delay(200);
+      tone(buzzer, 2000, 100);
+      delay(200);
+    }
   }
 
   PowerBttn();

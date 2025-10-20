@@ -8,7 +8,7 @@
 
 #define button 2
 
-bool pwr = true;
+bool pwr = false;
 
 void setup() {
     Serial.begin(9600);
@@ -60,6 +60,6 @@ void loop() {
     PowerBttn(); //Esta weaa no está funcionando xd
 
     if (pwr) {
-      mover(100,100);
+      mover(40,40);
     }
 }

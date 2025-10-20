@@ -47,7 +47,6 @@ int readIR() {
 }
 
 int relative_pos() {
-  readIR();
   float minimo = mini(valores);
   for (int i = 0; i<6; i++) {
     valores[i] = map(valores[i], 1024, minimo, 0, 255);
@@ -61,7 +60,6 @@ int relative_pos() {
 }
 
 void testIR() {
-  readIR();
   float minimo = mini(valores); 
   for (int i = 0; i<6; i++) {
     valores[i] = map(valores[i], 1024, minimo, 0, 255);
@@ -74,6 +72,7 @@ void testIR() {
 }
 
 void loop() {
+  readIR();
   testIR();
   //Serial.print(valores[1]); Serial.print(", ");
   delay(100);
