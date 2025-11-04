@@ -54,12 +54,12 @@ void mover(int leftSpeed, int rightSpeed) {
   analogWrite(PWMB, rightSpeed); // Speed for Motor B
 }
 
-int v = 0;
+int v = 100;
 
 void loop() {
     PowerBttn(); //Esta weaa no está funcionando xd
 
     if (pwr) {
-      mover(40,40);
+      mover(v*1.04,v);
     }
 }

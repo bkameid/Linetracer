@@ -15,6 +15,7 @@
 #define PWMA 5
 
 #define button 2
+#define buzzer 10
 
 int valores[6];
 float Kp = 0.1; //Constante Proporcional
@@ -44,6 +45,9 @@ void setup() {
   pinMode(BI2, OUTPUT);
   pinMode(PWMB, OUTPUT);
   pinMode(button, INPUT);
+  pinMode(buzzer, OUTPUT);
+
+  tone(buzzer, 700, 100);
 }
 
 bool pwr = false;
@@ -59,16 +63,16 @@ void PowerBttn() {
 }
 
 
-// max : array -> float
-// Devuelve el valor máximo de una array
-float maxi(int list[6]) {
-  float maximum = 0;
+// mini : array -> float
+// Devuelve el valor mínimo de una array
+float mini(int list[6]) {
+  float minimo = 1024;
   for (int i = 0; i<6; i++) {
-    if (list[i] > maximum) {
-      maximum = list[i];
+    if (list[i] < minimo) {
+      minimo = list[i];
     }
   }
-  return maximum;
+  return minimo;
 }
 
 // readIR : none -> none
@@ -87,8 +91,9 @@ int readIR() {
 // linea relativa al vehículo
 int relative_pos() {
   readIR();
+  float minimo = mini(valores);
   for (int i = 0; i<6; i++) {
-    valores[i] = map(valores[i], 0, maxi(valores), 0, 255);
+    valores[i] = map(valores[i], minimo, 1023, 0, 255);
   }
   float sumaPonderada = -2.5*valores[0]-1.5*valores[1]-0.5*valores[2]+0.5*valores[3]+1.5*valores[4]+2.5*valores[5];
   return sumaPonderada/6;

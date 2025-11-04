@@ -21,6 +21,8 @@
 #define buzzer 10
 
 int valores[6];
+int maximos[6];
+int minimos[6];
 
 void setup() {
   Serial.begin(9600);
@@ -44,6 +46,10 @@ void setup() {
     
   pinMode(button, INPUT);
   pinMode(buzzer, OUTPUT);
+
+  delay(2000);
+  tone(buzzer, 1000, 200);
+  calibrar();
 }
 
 bool pwr = false;
@@ -59,18 +65,6 @@ void PowerBttn() {
 }
 
 
-// mini : array -> float
-// Devuelve el valor mínimo de una array
-float mini(int list[6]) {
-  float minimo = 1024;
-  for (int i = 0; i<6; i++) {
-    if (list[i] < minimo) {
-      minimo = list[i];
-    }
-  }
-  return minimo;
-}
-
 // readIR : none -> none
 // Lee los valores de los sensores IR del frente y los convierte en array
 int readIR() {
@@ -82,14 +76,43 @@ int readIR() {
   valores[0] = analogRead(d7);
 }
 
+//calibrar : void -> void
+// Realiza la calibración de los sensores IR
+void calibrar() {
+  digitalWrite(IR, HIGH);
+  // Look for lower (白)
+  for (int i = 0; i<10; i++) {
+    readIR();
+    for (int j = 0; j<6; j++) {
+      if (valores[j] < minimos[j]) {
+        minimos[j] = valores[j];
+      }
+    delay(100);
+    }
+  }
+
+  tone(buzzer, 1000, 200);
+  delay(2000);
+  //look for upper (黒)
+  for (int i = 0; i<10; i++) {
+    readIR();
+    for (int j = 0; j<6; j++) {
+      if (valores[j] > maximos[j]) {
+        maximos[j] = valores[j];
+      }
+    }
+  }
+  tone(buzzer, 2000, 200);
+  delay(2000);
+}
+
 // relative_pos : void -> int
 // Devuelve un valor entre -255 y 255 correspondiendo a la posición de la
 // linea relativa al vehículo
 int relative_pos() {
   readIR();
-  float minimo = mini(valores);
   for (int i = 0; i<6; i++) {
-    valores[i] = map(valores[i], 1024, minimo, 0, 255);
+    valores[i] = map(valores[i], maximos[i], minimos[i], 0, 255);
   }
   float sumaPonderada = -2.5*valores[0]-1.5*valores[1]-0.5*valores[2]+0.5*valores[3]+1.5*valores[4]+2.5*valores[5];
 
@@ -111,16 +134,18 @@ void mover(int leftSpeed, int rightSpeed) {
 int hitR = 0;
 bool hitL = false;
 int geo[4] = {0,0,0,0}; 
+// ----------------------------------------------- Constantes -----------------------------------------------
+float Kp = 0.39; //Constante Proporcional
+float Kd = 0.1;  //Constante Derivada
+float Ki = 0;    //Constante Integral
+int ref = -60;
 
-float Kp = 0.20; //Constante Proporcional
-float Kd = 0;  //Constante Derivada
-float Ki = 0.0;    //Constante Integral
 float error = 0, lastError = 0;
 float integral = 0;
 float derivative = 0;
 float pos = 0, lastPos = 0;
 
-int vRecta = 40;
+int vRecta = 50;
 int vCurva = 30;
 
 int velocity = vRecta;
@@ -139,7 +164,6 @@ void hits() {
     geo[0] = 2;
   } else if (analogRead(HL) < umbral) {
     geo[0] = 1;
-    tone(buzzer, 1000, 50);
   } else {
     geo[0] = 0;
   }
@@ -147,18 +171,16 @@ void hits() {
   if (geo[0] != geo[1]) {
     if (geo[0] == 0 && geo[1] == 1 && geo[2] == 0) {
       // Código hit Izq
-      /*if (hitL == false) {
-        hitL = true;
-        Kp = 0.5;
-        velocity = vCurva;
-      } else {
-        hitL = false;
-        Kp = 0.2;
-        velocity = vRecta;
+      /*if (hitL == false) { // En Curva
+        Kp = 0.50;
+        Kd = 0.15;
+      } else {             // En Recta
+        Kd = 0.15;
+        Kp = 0.35;
       }*/
     } else if (geo[0] == 0 && geo[1] == 2 && geo[2] == 0) {
       // Código hit Der
-      hitR = hitR + 1;
+      //hitR = hitR + 1;
     } else if (geo[0] == 0 && geo[1] == 3 && geo[2] == 0) {
       // Código hit Ambos
     }
@@ -175,27 +197,11 @@ void PID() {
   derivative = error - lastError;
   int adjust = Kp*error + Ki*integral + Kd*derivative;
   lastError = error;
-  if (adjust < 0) {
-    adjust *= 1.5;
-  }
   int leftSpeed = velocity - adjust;
   int rightSpeed = velocity + adjust;
 
-  if (leftSpeed > 255) {
-    leftSpeed = 255;
-  }
-  if (rightSpeed > 255) {
-    rightSpeed = 255;
-  }
-  if (leftSpeed < 0) {
-    leftSpeed = 0;
-  }
-  if (rightSpeed < 0) {
-    rightSpeed = 0;
-  }
-
-  mover(leftSpeed, rightSpeed);
-  Serial.print(relative_pos());Serial.print("   |   ");
+  mover(leftSpeed*1.04, rightSpeed);
+  Serial.print(pos); Serial.print("   |   ");
   Serial.println(adjust);
 }
 
