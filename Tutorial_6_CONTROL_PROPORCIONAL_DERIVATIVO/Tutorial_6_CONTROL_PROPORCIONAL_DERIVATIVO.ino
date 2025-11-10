@@ -2,40 +2,43 @@
 #define PINBOTON 2
 #define PINLED 13
 #define PIN_Sensor_ON 11
-
+#define mover Motores
 
 int posicion_ideal = 0;
+
+bool hitL = false;
+bool  hitR = true;
+bool inStart = true;
 
 //cómo modificar el kprop: Comenzar con valores con valores bajos, y aumentar de a poco, hasta que siga la linea y quede oscilando.
 //cómo modificar el kderiv: Comenzar con valores con valores bajos, y aumentar de a poco, hasta que el robot deje de oscilar.
 
 //cuando el robot deje de oscilar, puedes subirle la velocidad nuevamente, y comenzar nuevamente a modificar el Kprop y el Kderiv.
 
-float Kprop = 0.35;  
-float Kderiv = 0.2;
-float Kint = 0.0001;
+float Kprop = 0.388; //0.388
+float Kderiv = 7; //0.2
+float Kint = 0.0;
 
 int ref = 0;
 
-int base = 90;
+int v;
+int base = 70; // < 65 -> Kp = 0.3
+int curva = 60;
 int error_pasado = 0;
 int error_cumulativo = 0;
 
 
 void setup() {
-    Serial.begin(115200);
+    Serial.begin(9600);
     Peripherals_init();
     TB6612FNG_init();
     Sensors_init();
 
     digitalWrite(PINLED, LOW);
-    delay(500);
-
-    Motores(0, 0);
-
-    delay(500);
     WaitBoton();
     calibracion();
+    WaitBoton();
+    delay(2000);
 }
 
 void PID() {
@@ -58,23 +61,17 @@ void PID() {
     error_cumulativo += error;
 }
 
-int vuelta = 0;
-bool inStart = true;
-
 void loop() {
-    hits();
-    if (hitR % 2 == 0) {
-        if (inStart) {
-            WaitBoton();
-            PID();
-        } else {
-            inStart = true;
-            error_cumulativo = 0;
-            error_pasado = 0;
-            Motores(0, 0);
-            WaitBoton();
-        }
+  hits();
+  if (inStart) {
+    PID();
+  } else {
+    if (!hitR) {
+      PID();
     } else {
-        PID();
+      Serial.print("meta");
+      Motores(0,0);
+      WaitBoton();
     }
+  }
 }

@@ -24,7 +24,6 @@ void WaitBoton() {
 // Función para emitir un sonido
 void beep() {
     tone(PINBUZZER, 2000, 100); // Emite un tono de 2000 Hz durante 100 ms
-    delay(200); // Espera 200 ms antes de continuar
 }
 
 void Peripherals_init() {

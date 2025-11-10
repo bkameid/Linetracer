@@ -1,8 +1,8 @@
+#define HR A0
+#define HL A7
+
 int umbral = 1000;
 int geo[4] = {0, 0, 0, 0};
-
-bool hitL = false;
-int hitR = 0;
 
 // hits : none -> none
 // geo = 0: no hay choque
@@ -23,10 +23,12 @@ void hits() {
     if (geo[0] != geo[1]) {
         if (geo[0] == 0 && geo[1] == 1 && geo[2] == 0) {
             // Código hit Izq
-
+            hitL != hitL;
         } else if (geo[0] == 0 && geo[1] == 2 && geo[2] == 0) {
             // Código hit Der
-            hitR++;
+            hitR = !hitR;
+            inStart = false;
+            beep();
         } else if (geo[0] == 0 && geo[1] == 3 && geo[2] == 0) {
             // Código hit Ambos
 
