@@ -23,6 +23,7 @@ void hits() {
     if (geo[0] != geo[1]) {
         if (geo[0] == 0 && geo[1] == 1 && geo[2] == 0) {
             // Código hit Izq
+            error_cumulativo = 0;
             hitL != hitL;
         } else if (geo[0] == 0 && geo[1] == 2 && geo[2] == 0) {
             // Código hit Der
