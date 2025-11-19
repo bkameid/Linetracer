@@ -1,7 +1,7 @@
 #define HR A0
 #define HL A7
 
-int umbral = 1000;
+int umbral = 950;
 int geo[4] = {0, 0, 0, 0};
 
 // hits : none -> none
@@ -23,8 +23,8 @@ void hits() {
     if (geo[0] != geo[1]) {
         if (geo[0] == 0 && geo[1] == 1 && geo[2] == 0) {
             // Código hit Izq
-            error_cumulativo = 0;
             hitL != hitL;
+            error_cumulativo = 0;
         } else if (geo[0] == 0 && geo[1] == 2 && geo[2] == 0) {
             // Código hit Der
             hitR = !hitR;

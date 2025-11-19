@@ -9,10 +9,7 @@ int l_pos;
 
 
 void Sensors_init() {
-
-pinMode(PIN_Sensor_ON, OUTPUT);
-
-
+    pinMode(PIN_Sensor_ON, OUTPUT);
 }
 
 
@@ -70,7 +67,7 @@ void readSensors() {
         if (s[i] > v_s_max[i]) {
             s[i] = v_s_max[i];
         }   
-        s_p[i] = map(s[i], v_s_min[i], v_s_max[i], 100, 0);
+        s_p[i] = map(s[i], v_s_min[i], v_s_max[i], 100, 0); //cambiado linea negra
     }
 
     volatile int sum = s_p[0] + s_p[1] + s_p[2] + s_p[3] + s_p[4] + s_p[5];
