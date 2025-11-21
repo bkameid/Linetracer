@@ -15,15 +15,15 @@ bool inStart = true;
 
 //cuando el robot deje de oscilar, puedes subirle la velocidad nuevamente, y comenzar nuevamente a modificar el Kprop y el Kderiv.
 
-float Kprop = 0.4 ; //0.388
-float Kderiv[5] = {10,15,10,10,10}; //0.2
-float Kint[5] = {0,0,0,0,0};
+float Kprop[5] = {0.6, 0.6,0.8} ; //0.388
+float Kderiv[5] = {20, 27, 35}; //0.2
+float Kint[5] = {0.005, 0, 0};
 
 int ref = 60;
 
 int vuelta = 0;
-int base[5] = {50,60,70,80,90}; // Error en 90
-int curva = 60;
+int base[5] = {100, 120, 140}; // Error en 90
+int v;
 int error_pasado = 0;
 int error_cumulativo = 0;
 
@@ -45,7 +45,7 @@ void PID() {
     int p = GetPos() - ref;
     int error = p - posicion_ideal;
     int d_error = error - error_pasado;
-    int correction_power = int(Kprop * error) + int(Kderiv[vuelta] * d_error) + int(Kint[vuelta] * error_cumulativo);
+    int correction_power = int(Kprop[vuelta] * error) + int(Kderiv[vuelta] * d_error) + int(Kint[vuelta] * error_cumulativo);
 
     if (correction_power > 255) {
         correction_power = 255;
@@ -56,7 +56,7 @@ void PID() {
         correction_power = -255;
     }
 
-    Motores(base[vuelta] + correction_power, base[vuelta] - correction_power);
+    Motores(v + correction_power, v - correction_power);
     error_pasado = error;
     error_cumulativo += error;
 }
@@ -64,8 +64,10 @@ void PID() {
 void loop() {
   hits();
   if (inStart) {
+    v = 80;
     PID();
   } else {
+    v = base[vuelta];
     if (!hitR) {
       PID();
     } else {
